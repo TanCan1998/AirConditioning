@@ -108,11 +108,13 @@ public class mainFrame extends JFrame implements ActionListener {
 		dry.setBackground(new Color(245, 251, 246));
 		dry.setBounds(21, 307, 79, 23);
 		contentPane.add(dry);
+		dry.addActionListener(this);
 
 		strongMode = new JRadioButton("强力");
 		strongMode.setBackground(new Color(245, 251, 246));
 		strongMode.setBounds(20, 341, 79, 23);
 		contentPane.add(strongMode);
+		strongMode.addActionListener(this);
 
 		JLabel label = new JLabel("型号：");
 		label.setBounds(383, 28, 54, 15);
@@ -214,35 +216,48 @@ public class mainFrame extends JFrame implements ActionListener {
 	// 点击按钮后的操作
 	public void actionPerformed(ActionEvent e) {
 		Object temp = e.getSource();
-		if (temp == userSwitch) {//切换账号
+		if (temp == userSwitch) {// 切换账号
 			lf.userSwitch();
 			lf.setVisible(true);
 			this.dispose();
-		} else if (temp == accountInfo) {//查看账号信息
-			logUpdate("账号信息\n"+"id:"+"  "+us.getId()+"\n");
+		} else if (temp == accountInfo) {// 查看账号信息
+			logUpdate("账号信息\n" + "id:" + "  " + us.getId() + "\n");
 			usinf.setVisible(true);
-		} else if (temp == up) {//提高设定温度
+		} else if (temp == up) {// 提高设定温度
 			logUpdate("升温\n");
-		} else if (temp == down) {//降低设定温度
+		} else if (temp == down) {// 降低设定温度
 			logUpdate("降温\n");
-		} else if (temp == history) {//查看历史数据
+		} else if (temp == history) {// 查看历史数据
 			logUpdate("历史数据\n");
-		} else if (temp == refresh) {//刷新图表框
+		} else if (temp == refresh) {// 刷新图表框
 			logUpdate("刷新图表\n");
-		} else if (temp == on_off) {//开机、关机
+		} else if (temp == on_off) {// 开机、关机
 			logUpdate("电源\n");
-		} else if (temp == switchButton) {//切换设备
+		} else if (temp == switchButton) {// 切换设备
 			logUpdate("切换设备\n");
-		} else if (temp == deviceBinding) {//绑定设备
+		} else if (temp == deviceBinding) {// 绑定设备
 			logUpdate("绑定设备\n");
-		} else if (temp == troubleShooting) {//故障排查
+		} else if (temp == troubleShooting) {// 故障排查
 			logUpdate("故障排查\n");
+		} else if (temp == dry) {// 故障排查
+			if (dry.isSelected()) {
+				logUpdate("除湿\t开\n");
+			} else {
+				logUpdate("除湿\t关\n");
+			}
+		} else if (temp == strongMode) {// 故障排查
+			if (strongMode.isSelected()) {
+				logUpdate("强力\t开\n");
+			} else {
+				logUpdate("强力\t关\n");
+			}
 		}
 	}
 
 	// 更新日志框文本
 	public void logUpdate(String s) {
-		textArea.append(s+"----------------------------------\n");
-		log.getVerticalScrollBar().setValue(log.getVerticalScrollBar().getMaximum());
+		textArea.append("----------------------------------\n" + s);
+		log.getVerticalScrollBar().setValue(log.getVerticalScrollBar().getMaximum() + 1);
 	}
+
 }

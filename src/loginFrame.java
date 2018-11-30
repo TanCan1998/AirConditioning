@@ -1,4 +1,3 @@
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -18,8 +17,6 @@ import javax.swing.JButton;
 import javax.swing.JPasswordField;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Dialog.ModalExclusionType;
-import java.awt.Window.Type;
 
 public class loginFrame extends JFrame {
 
@@ -76,10 +73,10 @@ public class loginFrame extends JFrame {
 		contentPane.setLayout(null);
 
 		JLabel title = new JLabel("   欢迎使用空调控制系统   ");
-		title.setBounds(74, 36, 174, 20);
+		title.setFont(new Font("SansSerif", Font.PLAIN, 15));
+		title.setBounds(74, 39, 174, 20);
 		contentPane.add(title);
 		title.setForeground(Color.PINK);
-		title.setFont(new Font("微软雅黑", Font.BOLD, 15));
 		title.setBackground(Color.DARK_GRAY);
 
 		JLabel l_user = new JLabel("账  号：");
@@ -157,6 +154,9 @@ public class loginFrame extends JFrame {
 		// 界面显示居中
 		Dimension screen = this.getToolkit().getScreenSize();
 		this.setLocation((screen.width - this.getSize().width) / 2, (screen.height - this.getSize().height) / 2);
+		
+		//测试避免输入密码
+		login("123", "123");
 	}
 	
 	public void userSwitch() {
