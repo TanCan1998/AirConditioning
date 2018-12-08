@@ -1,5 +1,3 @@
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -23,25 +21,23 @@ public class loginFrame extends JFrame {
 	private JPanel contentPane;
 	private JTextField t_user;
 	private JPasswordField t_password;
-	private static loginFrame frame;
-	private static mainFrame mf;
 	private user us = new user();
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					frame = new loginFrame();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					frame = new loginFrame();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
@@ -107,9 +103,9 @@ public class loginFrame extends JFrame {
 				}
 				int check = us.verification(s1, s2);
 				if (check == 1) {
-					mf = new mainFrame(frame, us);
-					mf.setVisible(true);
-					frame.setVisible(false);
+					Client.mf.setUser(us);
+					Client.mf.setVisible(true);
+					setVisible(false);
 				} else if (check == -1) {
 					JOptionPane.showMessageDialog(null, "账号或密码错误！", "【出错啦】", JOptionPane.WARNING_MESSAGE);
 					t_password.setText("");
@@ -124,6 +120,7 @@ public class loginFrame extends JFrame {
 		exit.setBounds(173, 225, 73, 28);
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				Client.out("Exit/");
 				System.exit(0);
 			}
 		});
