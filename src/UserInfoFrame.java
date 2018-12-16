@@ -6,14 +6,19 @@ import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import javax.swing.JLabel;
 
-public class userInfo extends JFrame {
+public class UserInfoFrame extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7990621731756891776L;
 	private JPanel contentPane;
 
 	/**
 	 * Create the frame.
 	 */
-	public userInfo(user us) {
+	public UserInfoFrame(User us) {
+		setAlwaysOnTop(true);
 		setTitle("用户信息");
 		// 设置窗体图标
 		ImageIcon icon = new ImageIcon(this.getClass().getResource("/img/1.png"));

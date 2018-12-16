@@ -4,16 +4,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.io.IOException;
+
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -26,27 +30,38 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JTextArea;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 
-public class mainFrame extends JFrame implements ActionListener {
+public class MainFrame extends JFrame implements ActionListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3902100901518207726L;
 	private JPanel contentPane;
-	private JMenuItem deviceBinding, userSwitch, accountInfo, troubleShooting, exit;
+	private JMenuItem minSize, deviceBinding, userSwitch, accountInfo, troubleShooting, exit;
 	private JTextField model;
-	private user us;
-	private userInfo usinf;
-	protected JComboBox<?> mode, windSpeed;
+	private User us;
+	private UserInfoFrame usinf;
+	protected JComboBox mode, windSpeed;
 	protected JTextArea textArea, mainContent;
 	private JButton refresh, switchButton, history, on_off, down, up;
-	protected JLabel currentTemp, setTemp;
+	protected JLabel currentTemp, setTemp, label_6;
 	protected JRadioButton dry, strongMode;
+	protected static DefaultTableModel dtm;
 	private JScrollPane log;
-	private JTable table;
+	protected static JTable table;
+	private MainFrame mf = this;
+	private String power = "开";
+	static int xOld, yOld;
 
 	/**
 	 * Create the frame.
 	 */
-	public mainFrame() {
+	public MainFrame() {
+		setAlwaysOnTop(true);
 		try {
+			this.setUndecorated(true); // 禁用或启用此窗体的修饰。只有在窗体不可显示时
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel"); // 设置成nimbus风格
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 				| UnsupportedLookAndFeelException e2) {
@@ -56,8 +71,6 @@ public class mainFrame extends JFrame implements ActionListener {
 		// 设置窗体图标
 		ImageIcon icon = new ImageIcon(this.getClass().getResource("/img/1.png"));
 		setIconImage(icon.getImage());
-		// 设置窗体按钮
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 583, 439);
 
 		JMenuBar menuBar = new JMenuBar();
@@ -70,6 +83,10 @@ public class mainFrame extends JFrame implements ActionListener {
 		deviceBinding = new JMenuItem("设备绑定");
 		system.add(deviceBinding);
 		deviceBinding.addActionListener(this);
+
+		minSize = new JMenuItem("最小化");
+		system.add(minSize);
+		minSize.addActionListener(this);
 
 		exit = new JMenuItem("退出");
 		system.add(exit);
@@ -95,14 +112,14 @@ public class mainFrame extends JFrame implements ActionListener {
 
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(245, 251, 246));
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setBorder(BorderFactory.createLineBorder(new Color(213, 241, 219), 5, true));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
 		JPanel panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(213, 241, 219), 5, true));
 		panel.setBackground(Color.WHITE);
-		panel.setBounds(20, 10, 353, 273);
+		panel.setBounds(18, 28, 353, 273);
 		contentPane.add(panel);
 		panel.setLayout(null);
 
@@ -112,53 +129,56 @@ public class mainFrame extends JFrame implements ActionListener {
 		mainContent.setBounds(6, 6, 341, 126);
 		panel.add(mainContent);
 
-		JScrollPane scrollPane = new JScrollPane(table);
-		scrollPane.setBounds(6, 141, 341, 126);
-		panel.add(scrollPane);
 		String[] cloum = { "日期", "室温", "模式", "强力", "除湿" };
 		Object[][] row = new Object[30][5];
-		DefaultTableModel dtm = new DefaultTableModel(row, cloum);
+		dtm = new DefaultTableModel(row, cloum);
 		table = new JTable(dtm);
 		table.setCellSelectionEnabled(true);
 		DefaultTableCellRenderer tcr = new DefaultTableCellRenderer();// 设置table内容居中
-		tcr.setHorizontalAlignment(JLabel.CENTER);
+		tcr.setHorizontalAlignment(JLabel.LEFT);
 		table.getTableHeader().setReorderingAllowed(false);// 表头不可拖动
+
 		table.setSelectionBackground(new Color(224, 255, 255));
 		table.setSelectionForeground(Color.black);
 		table.setDefaultRenderer(Object.class, tcr);
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setBounds(6, 141, 341, 126);
+		panel.add(scrollPane);
 		scrollPane.setViewportView(table);
+		tableresize();
 
 		refresh = new JButton("刷新");
 		refresh.setBackground(new Color(213, 241, 219));
-		refresh.setBounds(131, 307, 93, 23);
+		refresh.setBounds(136, 325, 93, 23);
 		contentPane.add(refresh);
 		refresh.addActionListener(this);
 
 		switchButton = new JButton("切换设备");
 		switchButton.setBackground(new Color(213, 241, 219));
-		switchButton.setBounds(234, 307, 93, 23);
+		switchButton.setBounds(239, 325, 93, 23);
 		contentPane.add(switchButton);
 		switchButton.addActionListener(this);
 
 		dry = new JRadioButton("除湿");
 		dry.setBackground(new Color(245, 251, 246));
-		dry.setBounds(21, 307, 79, 23);
+		dry.setBounds(45, 325, 79, 23);
 		contentPane.add(dry);
 		dry.addActionListener(this);
 
 		strongMode = new JRadioButton("强力");
 		strongMode.setBackground(new Color(245, 251, 246));
-		strongMode.setBounds(20, 341, 79, 23);
+		strongMode.setBounds(44, 359, 79, 23);
 		contentPane.add(strongMode);
 		strongMode.addActionListener(this);
 
 		JLabel label = new JLabel("型号：");
-		label.setBounds(383, 28, 54, 15);
+		label.setBounds(383, 31, 54, 15);
 		contentPane.add(label);
 
 		model = new JTextField("格力");
+		model.setHorizontalAlignment(SwingConstants.CENTER);
 		model.setEnabled(false);
-		model.setBounds(433, 22, 126, 26);
+		model.setBounds(433, 25, 126, 26);
 		model.setColumns(10);
 		model.setEditable(false);
 		contentPane.add(model);
@@ -183,10 +203,18 @@ public class mainFrame extends JFrame implements ActionListener {
 					String type = (String) mode.getSelectedItem();
 					if (type.equals("制热")) {
 						logUpdate("模式\t制热\n");
-						Client.out("mode/制热");
+						try {
+							Client.out("mode/制热");
+						} catch (IOException e1) {
+							mode.setSelectedItem("制冷");
+						}
 					} else {
 						logUpdate("模式\t制冷\n");
-						Client.out("mode/制冷");
+						try {
+							Client.out("mode/制冷");
+						} catch (IOException e1) {
+							mode.setSelectedItem("制热");
+						}
 					}
 				}
 			}
@@ -195,7 +223,7 @@ public class mainFrame extends JFrame implements ActionListener {
 
 		history = new JButton("历史数据");
 		history.setBackground(new Color(213, 241, 219));
-		history.setBounds(131, 341, 93, 23);
+		history.setBounds(136, 359, 93, 23);
 		contentPane.add(history);
 		history.addActionListener(this);
 
@@ -210,14 +238,23 @@ public class mainFrame extends JFrame implements ActionListener {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					String type = (String) windSpeed.getSelectedItem();
 					if (type.equals("大")) {
-						logUpdate("风速\t大\n");
-						Client.out("windSpeed/大");
+						try {
+							Client.out("windSpeed/大");
+							logUpdate("风速\t大\n");
+						} catch (IOException e1) {
+						}
 					} else if (type.equals("中")) {
-						logUpdate("风速\t中\n");
-						Client.out("windSpeed/中");
+						try {
+							Client.out("windSpeed/中");
+							logUpdate("风速\t中\n");
+						} catch (IOException e1) {
+						}
 					} else {
-						logUpdate("风速\t小\n");
-						Client.out("windSpeed/小");
+						try {
+							Client.out("windSpeed/小");
+							logUpdate("风速\t小\n");
+						} catch (IOException e1) {
+						}
 					}
 				}
 			}
@@ -226,7 +263,7 @@ public class mainFrame extends JFrame implements ActionListener {
 
 		log = new JScrollPane();
 		log.setBorder(new LineBorder(new Color(213, 241, 219), 4, true));
-		log.setBounds(387, 259, 172, 105);
+		log.setBounds(387, 259, 172, 131);
 		log.setEnabled(false);
 		log.getViewport().setBackground(Color.WHITE);
 		contentPane.add(log);
@@ -241,7 +278,7 @@ public class mainFrame extends JFrame implements ActionListener {
 
 		on_off = new JButton("电源");
 		on_off.setBackground(new Color(213, 241, 219));
-		on_off.setBounds(234, 342, 93, 23);
+		on_off.setBounds(239, 360, 93, 23);
 		contentPane.add(on_off);
 		on_off.addActionListener(this);
 
@@ -264,11 +301,13 @@ public class mainFrame extends JFrame implements ActionListener {
 		contentPane.add(label_4);
 
 		currentTemp = new JLabel("25");
+		currentTemp.setHorizontalAlignment(SwingConstants.CENTER);
 		currentTemp.setForeground(new Color(60, 179, 113));
 		currentTemp.setBounds(443, 132, 24, 18);
 		contentPane.add(currentTemp);
 
 		setTemp = new JLabel("20");
+		setTemp.setHorizontalAlignment(SwingConstants.CENTER);
 		setTemp.setForeground(new Color(60, 179, 113));
 		setTemp.setBounds(444, 164, 23, 18);
 		contentPane.add(setTemp);
@@ -277,21 +316,42 @@ public class mainFrame extends JFrame implements ActionListener {
 		lblNewLabel_2.setBounds(470, 132, 17, 18);
 		contentPane.add(lblNewLabel_2);
 
-		JLabel label_6 = new JLabel("℃");
+		label_6 = new JLabel("℃");
 		label_6.setBounds(470, 164, 17, 18);
 		contentPane.add(label_6);
 
 		// 界面显示居中
 		Dimension screen = this.getToolkit().getScreenSize();
 		this.setLocation((screen.width - this.getSize().width) / 2, (screen.height - this.getSize().height) / 2);
+
+		// 为移动窗口添加鼠标事件
+		this.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				xOld = e.getX();// 记录鼠标按下时的坐标
+				yOld = e.getY();
+			}
+		});
+		this.addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				int xOnScreen = e.getXOnScreen();
+				int yOnScreen = e.getYOnScreen();
+				int xx = xOnScreen - xOld;
+				int yy = yOnScreen - yOld;
+				mf.setLocation(xx, yy);// 设置拖拽后，窗口的位置
+			}
+		});
 	}
 
 	// 设置用户
-	public void setUser(user u) {
+	public void setUser(User u) {
 		us = u;
-		usinf = new userInfo(us);
+		usinf = new UserInfoFrame(us);
 		setTitle("欢迎您，" + us.getName());
 	}
+
+	String ttempre;
 
 	// 点击按钮后的操作
 	public void actionPerformed(ActionEvent e) {
@@ -299,35 +359,67 @@ public class mainFrame extends JFrame implements ActionListener {
 		if (temp == userSwitch) {// 切换账号
 			Client.lf.userSwitch();
 			Client.lf.setVisible(true);
+			Client.lf.setExtendedState(JFrame.NORMAL);// 窗口正常显示
 			textArea.setText(null);
 			this.dispose();
 		} else if (temp == accountInfo) {// 查看账号信息
 			logUpdate("账号信息\n" + "id:" + "  " + us.getId() + "\n");
 			usinf.setVisible(true);
+			usinf.setExtendedState(JFrame.NORMAL);
 		} else if (temp == up) {// 提高设定温度
 			int i = Integer.parseInt(setTemp.getText());
 			if (i == 30) {
-				JOptionPane.showMessageDialog(null, "温度不能超过30度！", "【提醒】", JOptionPane.DEFAULT_OPTION);
+				JOptionPane.showMessageDialog(this, "温度不能超过30度！", "【提醒】", JOptionPane.DEFAULT_OPTION);
 			} else {
-				logUpdate("升温\t" + setTemp.getText() + "+1\n");
-				setTemp.setText(i + 1 + "");
-				Client.out("setTemp/" + setTemp.getText());
+				try {
+					Client.out("setTemp/" + setTemp.getText());
+					logUpdate("升温\t" + setTemp.getText() + "+1\n");
+					setTemp.setText(i + 1 + "");
+				} catch (IOException e1) {
+				}
 			}
 		} else if (temp == down) {// 降低设定温度
 			int i = Integer.parseInt(setTemp.getText());
 			if (i == 16) {
-				JOptionPane.showMessageDialog(null, "温度不能低于16度！", "【提醒】", JOptionPane.DEFAULT_OPTION);
+				JOptionPane.showMessageDialog(this, "温度不能低于16度！", "【提醒】", JOptionPane.DEFAULT_OPTION);
 			} else {
-				logUpdate("降温\t" + setTemp.getText() + "-1\n");
-				setTemp.setText(i - 1 + "");
-				Client.out("setTemp/" + setTemp.getText());
+				try {
+					Client.out("setTemp/" + setTemp.getText());
+					logUpdate("降温\t" + setTemp.getText() + "-1\n");
+					setTemp.setText(i - 1 + "");
+				} catch (IOException e1) {
+				}
 			}
 		} else if (temp == history) {// 查看历史数据
 			logUpdate("历史数据\n");
 		} else if (temp == refresh) {// 刷新图表框
+			Client.tableflush();
 			logUpdate("刷新图表\n");
 		} else if (temp == on_off) {// 开机、关机
-			logUpdate("电源\n");
+			if (power.equals("开")) {
+				try {
+					Client.out("power/关");
+					power = "关";
+					ttempre = setTemp.getText();
+					setTemp.setText("Off");
+					setTemp.setForeground(Color.GRAY);
+					label_6.setText("");
+					logUpdate("电源\t关\n");
+					powerOff();
+				} catch (IOException e1) {
+				}
+			} else {
+				try {
+					Client.out("power/开");
+					power = "开";
+					setTemp.setText(ttempre);
+					setTemp.setForeground(new Color(60, 179, 113));
+					label_6.setText("℃");
+					logUpdate("电源\t开\n");
+					powerOn();
+				} catch (IOException e1) {
+				}
+			}
 		} else if (temp == switchButton) {// 切换设备
 			logUpdate("切换设备\n");
 		} else if (temp == deviceBinding) {// 绑定设备
@@ -336,23 +428,40 @@ public class mainFrame extends JFrame implements ActionListener {
 			logUpdate("故障排查\n");
 		} else if (temp == dry) {// 故障排查
 			if (dry.isSelected()) {
-				logUpdate("除湿\t开\n");
-				Client.out("dry/开");
+				try {
+					Client.out("dry/开");
+					logUpdate("除湿\t开\n");
+				} catch (IOException e1) {
+				}
 			} else {
-				logUpdate("除湿\t关\n");
-				Client.out("dry/关");
+				try {
+					Client.out("dry/关");
+					logUpdate("除湿\t关\n");
+				} catch (IOException e1) {
+				}
 			}
 		} else if (temp == strongMode) {// 故障排查
 			if (strongMode.isSelected()) {
-				logUpdate("强力\t开\n");
-				Client.out("strongMode/关");
+				try {
+					Client.out("strongMode/关");
+					logUpdate("强力\t开\n");
+				} catch (IOException e1) {
+				}
 			} else {
-				logUpdate("强力\t关\n");
-				Client.out("strongMode/关");
+				try {
+					Client.out("strongMode/关");
+					logUpdate("强力\t关\n");
+				} catch (IOException e1) {
+				}
 			}
-		} else if (temp == exit) {// 故障排查
-			Client.out("Exit/");
+		} else if (temp == exit) {// 退出
+			try {
+				Client.out("Exit/");
+			} catch (IOException e1) {
+			}
 			System.exit(0);
+		} else if (temp == minSize) {// 最小化
+			mf.setExtendedState(JFrame.ICONIFIED);
 		}
 	}
 
@@ -360,5 +469,32 @@ public class mainFrame extends JFrame implements ActionListener {
 	public void logUpdate(String s) {
 		textArea.append("----------------------------------\n" + s);
 		log.getVerticalScrollBar().setValue(log.getVerticalScrollBar().getMaximum());
+	}
+
+	// 电源
+	public void powerOff() {
+		Client.th.suspend();
+		mode.setEnabled(false);
+		windSpeed.setEnabled(false);
+		dry.setEnabled(false);
+		strongMode.setEnabled(false);
+		down.setEnabled(false);
+		up.setEnabled(false);
+	}
+	public void powerOn() {
+		mode.setEnabled(true);
+		windSpeed.setEnabled(true);
+		dry.setEnabled(true);
+		strongMode.setEnabled(true);
+		down.setEnabled(true);
+		up.setEnabled(true);
+		Client.th.resume();
+	}
+	public static void tableresize() {
+		table.getColumnModel().getColumn(0).setPreferredWidth(140);
+		table.getColumnModel().getColumn(1).setPreferredWidth(80);
+		table.getColumnModel().getColumn(2).setPreferredWidth(80);
+		table.getColumnModel().getColumn(3).setPreferredWidth(80);
+		table.getColumnModel().getColumn(4).setPreferredWidth(80);
 	}
 }

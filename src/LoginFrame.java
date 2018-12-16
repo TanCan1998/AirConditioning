@@ -14,35 +14,25 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPasswordField;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 
-public class loginFrame extends JFrame {
+public class LoginFrame extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1163828073829702140L;
 	private JPanel contentPane;
 	private JTextField t_user;
 	private JPasswordField t_password;
-	private user us = new user();
-
-	/**
-	 * Launch the application.
-	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					frame = new loginFrame();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
-
+	private User us = new User();
+	
 	/**
 	 * Create the frame.
 	 */
-	public loginFrame() {
+	public LoginFrame() {
+		setAlwaysOnTop(true);
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel"); // 设置成nimbus风格
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -53,7 +43,7 @@ public class loginFrame extends JFrame {
 		ImageIcon icon = new ImageIcon(this.getClass().getResource("/img/1.png"));
 		setIconImage(icon.getImage());
 		// 设置窗体按钮
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setAutoRequestFocus(false);//禁止自动聚焦
 		setTitle("登录");
 		setBounds(100, 100, 330, 317);
@@ -105,6 +95,7 @@ public class loginFrame extends JFrame {
 				if (check == 1) {
 					Client.mf.setUser(us);
 					Client.mf.setVisible(true);
+					Client.mf.toFront();
 					setVisible(false);
 				} else if (check == -1) {
 					JOptionPane.showMessageDialog(null, "账号或密码错误！", "【出错啦】", JOptionPane.WARNING_MESSAGE);
@@ -120,7 +111,10 @@ public class loginFrame extends JFrame {
 		exit.setBounds(173, 225, 73, 28);
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Client.out("Exit/");
+				try {
+					Client.out("Exit/");
+				} catch (IOException e) {
+				}
 				System.exit(0);
 			}
 		});

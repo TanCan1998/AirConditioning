@@ -3,7 +3,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class user {
+public class User {
 	public int getId() {
 		return id;
 	}
