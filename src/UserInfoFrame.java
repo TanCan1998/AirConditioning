@@ -7,17 +7,19 @@ import java.awt.Color;
 import javax.swing.JLabel;
 
 public class UserInfoFrame extends JFrame {
-
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 7990621731756891776L;
+	User us;
 	private JPanel contentPane;
+	protected JLabel name,tel,address;
 
 	/**
 	 * Create the frame.
 	 */
 	public UserInfoFrame(User us) {
+		this.us=us;
 		setAlwaysOnTop(true);
 		setTitle("用户信息");
 		// 设置窗体图标
@@ -49,23 +51,28 @@ public class UserInfoFrame extends JFrame {
 		label_2.setBounds(64, 100, 57, 21);
 		contentPane.add(label_2);
 		
-		JLabel lblNewLabel = new JLabel(us.getName());
-		lblNewLabel.setForeground(Color.PINK);
-		lblNewLabel.setBounds(146, 41, 119, 15);
-		contentPane.add(lblNewLabel);
+		name = new JLabel(us.name);
+		name.setForeground(Color.PINK);
+		name.setBounds(146, 41, 119, 15);
+		contentPane.add(name);
 		
-		JLabel label_3 = new JLabel(us.getTel());
-		label_3.setForeground(Color.PINK);
-		label_3.setBounds(146, 72, 119, 15);
-		contentPane.add(label_3);
+		tel = new JLabel(us.tel);
+		tel.setForeground(Color.PINK);
+		tel.setBounds(146, 72, 119, 15);
+		contentPane.add(tel);
 		
-		JLabel label_4 = new JLabel(us.getAddress());
-		label_4.setForeground(Color.PINK);
-		label_4.setBounds(146, 103, 119, 15);
-		contentPane.add(label_4);
+		address = new JLabel(us.address);
+		address.setForeground(Color.PINK);
+		address.setBounds(146, 103, 119, 15);
+		contentPane.add(address);
 		
 		//界面显示居中
 		Dimension screen = this.getToolkit().getScreenSize();
 		this.setLocation((screen.width-this.getSize().width)/2,(screen.height-this.getSize().height)/2);
+	}
+	public void set() {
+		name.setText(us.name);
+		address.setText(us.address);
+		tel.setText(us.tel);
 	}
 }

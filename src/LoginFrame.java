@@ -26,8 +26,8 @@ public class LoginFrame extends JFrame {
 	private JPanel contentPane;
 	private JTextField t_user;
 	private JPasswordField t_password;
-	private User us = new User();
-	
+	private LoginFrame lf = this;
+
 	/**
 	 * Create the frame.
 	 */
@@ -44,7 +44,7 @@ public class LoginFrame extends JFrame {
 		setIconImage(icon.getImage());
 		// 设置窗体按钮
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		setAutoRequestFocus(false);//禁止自动聚焦
+		setAutoRequestFocus(false);// 禁止自动聚焦
 		setTitle("登录");
 		setBounds(100, 100, 330, 317);
 		contentPane = new JPanel();
@@ -88,19 +88,10 @@ public class LoginFrame extends JFrame {
 				s1 = t_user.getText().replace(" ", "");
 				s2 = new String(t_password.getPassword()).replace(" ", "");
 				if (s1.equals("")) {
-					JOptionPane.showMessageDialog(null, "账号未输入！", "【提示】", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(lf, "账号未输入！", "【提示】", JOptionPane.INFORMATION_MESSAGE);
 					return;
 				}
-				int check = us.verification(s1, s2);
-				if (check == 1) {
-					Client.mf.setUser(us);
-					Client.mf.setVisible(true);
-					Client.mf.toFront();
-					setVisible(false);
-				} else if (check == -1) {
-					JOptionPane.showMessageDialog(null, "账号或密码错误！", "【出错啦】", JOptionPane.WARNING_MESSAGE);
-					t_password.setText("");
-				}
+				toLogin(s1,s2);
 			}
 		});
 		enter.setBounds(173, 179, 73, 28);
@@ -134,7 +125,8 @@ public class LoginFrame extends JFrame {
 		JButton about = new JButton("关于");
 		about.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(null, "Version:  1.0.0\nAuthers:  苏敬澎，谭灿", "【软件信息】", JOptionPane.DEFAULT_OPTION);
+				JOptionPane.showMessageDialog(lf, "Version:  1.0.0\nAuthers:  苏敬澎，谭灿", "【软件信息】",
+						JOptionPane.DEFAULT_OPTION);
 			}
 		});
 		about.setForeground(Color.GRAY);
@@ -145,18 +137,40 @@ public class LoginFrame extends JFrame {
 		// 界面显示居中
 		Dimension screen = this.getToolkit().getScreenSize();
 		this.setLocation((screen.width - this.getSize().width) / 2, (screen.height - this.getSize().height) / 2);
-		
-		//测试避免输入密码
+
+		// 测试避免输入密码
 		login("123", "123");
 	}
-	
+
 	public void userSwitch() {
 		t_user.setText("");
 		t_password.setText("");
 	}
-	
+
 	public void login(String nm, String pw) {
 		t_user.setText(nm);
 		t_password.setText(pw);
 	}
+
+	public void toLogin(String s1, String s2) {
+		try {
+			Client.out.write("verification/".getBytes());
+			Client.out.write((s1 + "/" + s2).getBytes());
+		} catch (IOException e) {
+			// TODO 自动生成的 catch 块
+			e.printStackTrace();
+		}
+	}
+	
+	public void toMainf() {
+		Client.mf.setVisible(true);
+		Client.mf.toFront();
+		setVisible(false);
+	}
+	
+	public void failed() {
+		JOptionPane.showMessageDialog(lf, "账号或密码错误！", "【出错啦】", JOptionPane.WARNING_MESSAGE);
+		t_password.setText("");
+	}
+
 }

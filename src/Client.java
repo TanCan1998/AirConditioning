@@ -15,10 +15,12 @@ public class Client {
 	protected static LoginFrame lf;// 登陆页面
 	protected static MainFrame mf = new MainFrame();// 主页面
 	protected static LoadingFrame loadf = new LoadingFrame();// 启动页面
-	static OutputStream out;// 输出流
+	static OutputStream out;// 输出输入流
+	static InputStream in ;
 	protected static int flag, flag1;// 线程or循环标签
 	protected static Thread th;
 	private static DBHelper dh = new DBHelper();
+	protected static User us = new User();
 
 	public static void main(String[] args) {
 		try {
@@ -40,15 +42,14 @@ public class Client {
 					flag1++;
 					String s = (flag1 % 2 == 0) ? "连接服务器中......" : "请稍等";
 					loadf.label.setText(s);
-					// e.printStackTrace();
 				}
 			}
 			Thread.sleep(3500);// 缓冲加载登陆界面，以免太快而闪烁
 			loadf.setVisible(false);
 			lf.setVisible(true);
-			lf.toFront();// 页面前置
+			lf.toFront();// 登陆页面前置
 			// 获取输入流
-			InputStream in = s.getInputStream();
+			in = s.getInputStream();
 			// 获取输出流
 			out = s.getOutputStream();
 			// 获取服务端首次信息
@@ -81,7 +82,28 @@ public class Client {
 					} else {
 						mf.currentTemp.setForeground(new Color(32, 209, 206));
 					}
-				} else {
+				} else if (type.equals("verification")) {
+					if(content.equals("1")) {
+						mf.setUser();
+						lf.toMainf();
+					} else {
+						lf.failed();
+					}
+				} else if (type.equals("userinfo")) {
+					String name,address,tel,id,rest;
+					name=content.substring(0, content.indexOf("/"));
+					rest=content.substring(content.indexOf("/") + 1);
+					tel=rest.substring(0, rest.indexOf("/"));
+					rest=rest.substring(rest.indexOf("/") + 1);
+					address=rest.substring(0, rest.indexOf("/"));
+					rest=rest.substring(rest.indexOf("/") + 1);
+					id=rest.substring(0, rest.length());
+					us.name=name;
+					us.tel=tel;
+					us.address=address;
+					us.id=Integer.parseInt(id);
+					mf.usinf.set();
+				} else if (type.equals("EXIT")) {
 					flag = 0;
 					Timer timer = new Timer();
 					timer.schedule(new TimerTask() {// 5秒后自动退出
@@ -128,26 +150,26 @@ public class Client {
 		}
 	}
 
-	public static void tableflush() {
+	public static void tableflush() {//刷新表格
 		dh.conn();
 		String[] cloum = { "日期", "室温", "模式", "强力", "除湿" };
 		Object[][] row = new Object[30][5];
 		try {
-			String sql = "select * from log order by id desc limit 30";//sql语句
+			String sql = "select * from log order by id desc limit 30";// sql语句
 			ResultSet rs = dh.getRS(sql);
-			int i=0;
-			while(rs.next()) {
-				row[i][0]=rs.getString("time");
-				row[i][1]=rs.getString("tempre");
-				row[i][2]=rs.getString("mode");
-				row[i][3]=rs.getString("strongMode");
-				row[i][4]=rs.getString("dry");
+			int i = 0;
+			while (rs.next()) {
+				row[i][0] = rs.getString("time");
+				row[i][1] = rs.getString("tempre");
+				row[i][2] = rs.getString("mode");
+				row[i][3] = rs.getString("strongMode");
+				row[i][4] = rs.getString("dry");
 				i++;
 			}
-			MainFrame.dtm.setDataVector(row,cloum);       
+			MainFrame.dtm.setDataVector(row, cloum);
 			MainFrame.dtm.fireTableStructureChanged();
 			MainFrame.tableresize();
-		} catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			dh.close();

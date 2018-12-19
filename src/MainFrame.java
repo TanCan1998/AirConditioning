@@ -41,8 +41,7 @@ public class MainFrame extends JFrame implements ActionListener {
 	private JPanel contentPane;
 	private JMenuItem minSize, deviceBinding, userSwitch, accountInfo, troubleShooting, exit;
 	private JTextField model;
-	private User us;
-	private UserInfoFrame usinf;
+	protected UserInfoFrame usinf;
 	protected JComboBox mode, windSpeed;
 	protected JTextArea textArea, mainContent;
 	private JButton refresh, switchButton, history, on_off, down, up;
@@ -272,7 +271,7 @@ public class MainFrame extends JFrame implements ActionListener {
 		textArea.setEditable(false);
 		log.setViewportView(textArea);
 
-		JLabel label_3 = new JLabel("使用日志");
+		JLabel label_3 = new JLabel("操作记录");
 		label_3.setBounds(445, 232, 54, 15);
 		contentPane.add(label_3);
 
@@ -345,10 +344,8 @@ public class MainFrame extends JFrame implements ActionListener {
 	}
 
 	// 设置用户
-	public void setUser(User u) {
-		us = u;
-		usinf = new UserInfoFrame(us);
-		setTitle("欢迎您，" + us.getName());
+	public void setUser() {
+		usinf = new UserInfoFrame(Client.us);
 	}
 
 	String ttempre;
@@ -363,7 +360,7 @@ public class MainFrame extends JFrame implements ActionListener {
 			textArea.setText(null);
 			this.dispose();
 		} else if (temp == accountInfo) {// 查看账号信息
-			logUpdate("账号信息\n" + "id:" + "  " + us.getId() + "\n");
+			logUpdate("账号信息\n" + "id:" + "  " + Client.us.id + "\n");
 			usinf.setVisible(true);
 			usinf.setExtendedState(JFrame.NORMAL);
 		} else if (temp == up) {// 提高设定温度

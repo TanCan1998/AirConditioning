@@ -1,35 +1,16 @@
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class User {
-	public int getId() {
-		return id;
-	}
-
-	public String getAccount() {
-		return account;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public String getTel() {
-		return tel;
-	}
-
-	private int id;
-	private String name, password, address, tel, account;
+public class User implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4687554035689694915L;
+	protected int id;
+	protected String name, password, address, tel, account;
 	private DBHelper dh = new DBHelper();
 	
 	private static String toHex(byte buffer[]) {//byte[]转String
